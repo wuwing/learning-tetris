@@ -1,6 +1,5 @@
 /******************************************************
-<<<<<<< HEAD
- * File Name:   git/learning-tetris/tetris.cpp
+ * File Name:   tetris.cpp
  * Author:      kojimai
  * Creater Time:2014年09月19日 星期五 20时51分40秒
 ******************************************************/
@@ -40,11 +39,6 @@ class Shape//建立一个形状类
 		int coord[4][2];//形状的坐标
 		allshape curshape;//当前形状
 };
-=======
- * File Name:   tetris.cpp
- * Author:      kojimai
- * Creater Time:2014年09月03日 星期三 01时00分51秒
-******************************************************/
 
 #include "wx/wx.h"
 
@@ -53,4 +47,3 @@ class Tetris :public wxFrame
 	public:
 
 }
->>>>>>> 6d517ca39f48d83b3623cca2374e52ef343571d0
