@@ -40,10 +40,22 @@ class Shape//建立一个形状类
 		allshape curshape;//当前形状
 };
 
-#include "wx/wx.h"
-
+class Board:public wxPanel
+{
+	public:
+	protected:
+	private:
+}
 class Tetris :public wxFrame
 {
 	public:
+		Tetris(const wxString &title);
+};
 
+IMPLEMENT_APP(MyApp)
+Tetris::Tetris(const wxString &title):wxFrame(NULL,wxID_ANY,title,wxDefaultPosition,wxSize(180,380))
+{
+	Board *board = new Board(this);
+	board->SetFocus();
+	board->Centre();
 }
