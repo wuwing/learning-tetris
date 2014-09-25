@@ -33,29 +33,74 @@ class Shape//建立一个形状类
 		void SetShape(allshape shape);//赋给当前的形状值
 		void RandomShape();//随机赋形状
 
+		void SetX(int index,int x){
+			coord[index][0]=x;
+		}
+		void SetY(int index,int y){
+			coord[index][1]=y;
+		}
+		//改变形状
 		Shape Rotate();//旋转
 
 	private:
 		int coord[4][2];//形状的坐标
 		allshape curshape;//当前形状
 };
-
-class Board:public wxPanel
+//游戏窗口
+class LeftPanel:public wxPanel
 {
 	public:
-	protected:
-	private:
-}
-class Tetris :public wxFrame
+		LeftPanel(wxPanel *parent);
+		wxPanel *mp;
+};
+//状态栏
+class RightPanel:public wxPanel
+{
+	public:
+		RightPanel(wxPanel *parent);
+		wxPanel *mp;
+};
+
+//总框架
+class Tetris:public wxFrame
 {
 	public:
 		Tetris(const wxString &title);
-};
 
-IMPLEMENT_APP(MyApp)
-Tetris::Tetris(const wxString &title):wxFrame(NULL,wxID_ANY,title,wxDefaultPosition,wxSize(180,380))
+		LeftPanel *lp;
+		RightPanel *rp;
+		wxMenuBar *mb;
+		wxPanel *mp;
+	protected:
+	private:
+};
+Tetris::Tetris(const wxString &title):wxFrame(NULL,wxID_ANY,title,wxDefaultPosition,wxSize(400,200))//
 {
-	Board *board = new Board(this);
-	board->SetFocus();
-	board->Centre();
+	mp = new wxPanel(this,wxID_ANY);
+
+	wxBoxSizer *hbox = new wxBoxSizer(wxHORITONTAL);
+
+	lp = new LeftPanel(mp);
+	rp = new RightPanel(rp);
+
+	hbox->Add(lp);/**/
+	hbox->Add(rp);/**/
+
+	mp->SetSizer(hbox);
+
+	Centre();
+}
+
+//运行端
+class MyApp:public wxApp
+{
+	public:
+		virtual bool OnInit();
+};
+IMPLEMENT_APP(MyApp)
+bool MyApp::OnInit()
+{
+	Tetris *tetris = new Tetris(wxT("Tetris"));
+	tetris->Show(true);
+	return true;
 }
