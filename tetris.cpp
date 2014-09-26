@@ -33,6 +33,15 @@ class Shape//建立一个形状类
 		void SetShape(allshape shape);//赋给当前的形状值
 		void RandomShape();//随机赋形状
 
+		int x(int index) const{
+			return coord[index][0];
+		}
+		int y(int index) const{
+			return coord[index][1];
+		}
+		Shape Rotate();//旋转
+
+	private:
 		void SetX(int index,int x){
 			coord[index][0]=x;
 		}
@@ -40,9 +49,7 @@ class Shape//建立一个形状类
 			coord[index][1]=y;
 		}
 		//改变形状
-		Shape Rotate();//旋转
 
-	private:
 		int coord[4][2];//形状的坐标
 		allshape curshape;//当前形状
 };
@@ -58,8 +65,8 @@ void Shape::SetShape(allshape shape)
 }
 void RandomShape()
 {
-	int x = rand()%7 + 1;
-	SetShape(x);//(allshape(x))
+	int ran = rand()%7 + 1;
+	SetShape(ran);//(allshape(ran))
 }
 Shape Shape::Rotate()
 {
@@ -69,8 +76,8 @@ Shape Shape::Rotate()
 	ret.curshape = curshpae;
 	for(int i=0;i<4;i++)
 	{
-		ret.SetX(i,coord[i][1]);
-		ret.SetY(i,-coord[i][0]);
+		ret.SetX(i,y(i));
+		ret.SetY(i,-x(i));
 	}
 	return ret;
 }
@@ -80,9 +87,71 @@ class LeftPanel:public wxPanel
 {
 	public:
 		LeftPanel(wxPanel *parent);
+		void Start();
+		void Pause();
+		void Quit();
+
+	protected:
+		void OnPaint(wxPaintEvent &event);
+		void OnKeyDown(wxKeyEvent &event);
+		void OnTimer(wxCommandEvent &event);
+
+	private:
+		const int BoardWidth = 10,BoardHeight = 20;
+
+		allshape & ShapeAt(int x,int y){
+			return board[BoardWidth*y+x];
+		}
+		void ClearBoard();
+		void DropDown();
+		void OneLineDown();
+		void Dropped();
+		void RemoveFullLines();
+		void NewShape();
+		bool TryMove(const Shape& newshpae,int newX,int newY);
+		void DrawSquare(wxPaintDC &dc,int x,int y,allshape nshape);
+		//void LevelUp();
+
+		wxTimer *timer;
 		wxPanel *mp;
+		bool Paused;
+		bool Started;
+		bool FallingFinished;
+		Shape nowshape;
+		int nowx;
+		int nowy;
+		int socre;
+		int level;
+		allshape board[BoardWidth * BoardHeight];
 };
-LeftPanel::LeftPanel(wxPanel *parent):wxPanel(parent,-wxID_ANY,wxPoint(-1,-1))
+LeftPanel::LeftPanel(wxPanel *parent):wxPanel(parent,wxID_ANY,wxPoint(-1,-1),wxDefaultPosition,wxBORDER_NONE)
+{
+	timer = new wxTimer(this,1);
+	Paused = false;
+	Started = false;
+	FallingFinished = false;
+	level = 1;
+	socre = 0;
+
+	ClearBoard();
+
+	Connect(wxEVT_PAINT,wxPaintEventHandler(LeftPanel::OnPaint));
+	Connect(wxEVT_TIMER,wxCommandEventHandler(LeftPanel::OnTimer));
+	Connect(wxEVT_KEY_DOWN,wxKeyEvnetHandler(LeftPanel::OnKeyDown));
+}
+void LeftPanel::Start()
+{
+	if(Paused)
+		return;
+	Started = true;
+	FallingFinished = false;
+	level = 1;
+	socre = 0;
+	ClearBoard();
+
+	NewShape();
+	timer->Timer(300);
+}
 
 //状态栏
 class RightPanel:public wxPanel
