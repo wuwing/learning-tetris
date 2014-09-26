@@ -46,6 +46,35 @@ class Shape//建立一个形状类
 		int coord[4][2];//形状的坐标
 		allshape curshape;//当前形状
 };
+void Shape::SetShape(allshape shape)
+{
+	for(int i=0;i<4;i++)
+	{
+		coord[i][0]=coords[shape][i][0];
+		coord[i][1]=coords[shape][i][1];
+	}
+	curshape = shape;
+	return;
+}
+void RandomShape()
+{
+	int x = rand()%7 + 1;
+	SetShape(x);//(allshape(x))
+}
+Shape Shape::Rotate()
+{
+	if(curshape == SquareShape)
+		return *this;
+	Shape ret;
+	ret.curshape = curshpae;
+	for(int i=0;i<4;i++)
+	{
+		ret.SetX(i,coord[i][1]);
+		ret.SetY(i,-coord[i][0]);
+	}
+	return ret;
+}
+
 //游戏窗口
 class LeftPanel:public wxPanel
 {
@@ -53,6 +82,8 @@ class LeftPanel:public wxPanel
 		LeftPanel(wxPanel *parent);
 		wxPanel *mp;
 };
+LeftPanel::LeftPanel(wxPanel *parent):wxPanel(parent,-wxID_ANY,wxPoint(-1,-1))
+
 //状态栏
 class RightPanel:public wxPanel
 {
@@ -83,8 +114,8 @@ Tetris::Tetris(const wxString &title):wxFrame(NULL,wxID_ANY,title,wxDefaultPosit
 	lp = new LeftPanel(mp);
 	rp = new RightPanel(rp);
 
-	hbox->Add(lp);/**/
-	hbox->Add(rp);/**/
+	hbox->Add(lp,1,wxALL,5);/**/
+	hbox->Add(rp,1,wxALL,5);/**/
 
 	mp->SetSizer(hbox);
 
