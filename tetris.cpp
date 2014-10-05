@@ -63,7 +63,7 @@ void Shape::SetShape(allshape shape)
 	curshape = shape;
 	return;
 }
-void RandomShape()
+void Shape::RandomShape()
 {
 	int ran = rand()%7 + 1;
 	SetShape(ran);//(allshape(ran))
@@ -89,7 +89,6 @@ class LeftPanel:public wxPanel
 		LeftPanel(wxPanel *parent);
 		void Start();
 		void Pause();
-		void Quit();
 
 	protected:
 		void OnPaint(wxPaintEvent &event);
@@ -122,7 +121,7 @@ class LeftPanel:public wxPanel
 		int nowy;
 		int socre;
 		int level;
-		allshape board[BoardWidth * BoardHeight];
+		allshape board[BoardWidth][BoardHeight];
 };
 LeftPanel::LeftPanel(wxPanel *parent):wxPanel(parent,wxID_ANY,wxPoint(-1,-1),wxDefaultPosition,wxBORDER_NONE)
 {
@@ -150,7 +149,53 @@ void LeftPanel::Start()
 	ClearBoard();
 
 	NewShape();
-	timer->Timer(300);
+	timer->Start(300);
+}
+void LeftPanel::NewShape()  {
+	nowshape.RandomShape();
+	return;
+}
+void LeftPanel::Pause() {//暂停
+	if(!Started) return;
+
+	Paused = !Paused;
+	if(!Paused)  {
+		timer->Start(300);
+	}
+	else  {
+		timer->Stop();
+	}
+}
+void LeftPanel::ClearBoard()  {
+	for(int i = 0; i < BoardWidth; i++)
+		for(int j = 0; j < BoardHeight; j++)
+			board[i][j] = NoShape;
+}
+bool LeftPanel::TryMove(const Shape& piece,int newX,int newY)  {
+	for(int i = 0; i < 4; i++)  {
+		int x = newX + newPiece.x(i);
+		int y = newY + newPiect.y(i);
+		if(x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight)
+			return false;
+		if(ShapeAt(x,y) != NoShape)
+			return false;
+	}
+	nowshape = piece ;
+	nowx = newX;
+	nowy = newY;
+	//Refresh();
+	return true;
+}
+void LeftPanel::newshpae()  {
+	nowshape.RandomShape();
+	nowx = BoardWidth/2 + 1;
+	nowy = BoardHeight - 1 ;//+miny();
+
+	if(!TryMove(nowshape,nowx,nowy))  {
+		nowshape.SetShape(NoShape);
+		timer->Stop();
+		Started = false;
+	}
 }
 
 //状态栏
@@ -160,6 +205,10 @@ class RightPanel:public wxPanel
 		RightPanel(wxPanel *parent);
 		wxPanel *mp;
 };
+RightPanel::RightPanel(wxPanel *parent):wxPanel(parent,wxID_ANY,wxPoint(-1,-1),wxDefautlPositon)
+{
+	//
+}
 
 //总框架
 class Tetris:public wxFrame
@@ -172,7 +221,10 @@ class Tetris:public wxFrame
 		wxMenuBar *mb;
 		wxPanel *mp;
 	protected:
+		void OnQuit(wxCommandEvent &event);
 	private:
+		wxMenubar *menubar;
+		wxMenu *file;
 };
 Tetris::Tetris(const wxString &title):wxFrame(NULL,wxID_ANY,title,wxDefaultPosition,wxSize(400,200))//
 {
@@ -189,6 +241,16 @@ Tetris::Tetris(const wxString &title):wxFrame(NULL,wxID_ANY,title,wxDefaultPosit
 	mp->SetSizer(hbox);
 
 	Centre();
+
+	//菜单栏
+	const int wxNew = 101;
+	menubar = new wxMenubar;
+	file = new wxMenu;
+	file->Append(wxNew,wxT("New Game"));
+	file->Append(wxID_EXIT,wxT("&Quit"));
+	menubar->Append(file,wxT("File"));
+	Connect(wxNew,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(LeftPanel::Start));
+	Connect(wxID_EXIT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(Tetris::OnQuit));
 }
 
 //运行端
